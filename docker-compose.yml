@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  backend: 
+    build: ./Backend 
+    container_name: backend_server
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./Backend/.env
+    depends_on:
+      - mongo # starts the mongo service before the backend
+    volumes:
+      - ./Backend:/app # Mount the backend directory to the container for live code updates
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db # Persist MongoDB data
+
+  frontend:
+    build: ./Frontend
+    container_name: frontend_client
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend # starts the backend service before the frontend
+    volumes:
+      - ./Frontend:/app # Mount the frontend directory to the container for live code updates
